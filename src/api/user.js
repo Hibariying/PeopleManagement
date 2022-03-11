@@ -1,18 +1,31 @@
-import request from '@/utils/request'
+import request from '@/utils/request'// promise对象
 
+/** *
+* 登陆接口的封装
+* **/
 export function login(data) {
   return request({
-    url: '/vue-admin-template/user/login',
+    url: '/sys/login',
     method: 'post',
     data
   })
 }
-
-export function getInfo(token) {
+/** *
+* 获取用户资料结果接口的封装
+* **/
+export function getUserInfo(token) {
   return request({
-    url: '/vue-admin-template/user/info',
-    method: 'get',
-    params: { token }
+    url: '/sys/profile',
+    method: 'post'
+  })
+}
+
+/** *
+* 获取用户基本信息接口的封装
+* **/
+export function getUserDetailById(id) {
+  return request({
+    url: `/sys/user/${id}`
   })
 }
 
