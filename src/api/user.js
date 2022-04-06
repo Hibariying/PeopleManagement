@@ -28,10 +28,16 @@ export function getUserDetailById(id) {
     url: `/sys/user/${id}`
   })
 }
-
+/** *
+* 登出接口的封装
+* **/
 export function logout() {
   return request({
     url: '/vue-admin-template/user/logout',
     method: 'post'
   })
 }
+
+/** *
+* 获取用户基本信息接口的封装
+* **/

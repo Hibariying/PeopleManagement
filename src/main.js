@@ -16,6 +16,9 @@ import '@/icons' // icon
 import '@/permission' // permission control
 
 import * as directives from '@/directives'
+// 自定义组件
+import Component from '@/components'
+
 // 注册自定义指令
 // 遍历所有的导出的指令对象 完成自定义全局注册
 // .keys把对象变成数组
@@ -23,6 +26,13 @@ Object.keys(directives).forEach(key => {
   // 注册自定义指令
   Vue.directive(key, directives[key])
 })
+// 将工具函数转换成过滤器
+import * as filters from '@/filters'
+Object.keys(filters).forEach(key => {
+  // 注册自定义过滤器
+  Vue.filter(key, filters[key])
+})
+
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api
@@ -41,7 +51,12 @@ Vue.use(ElementUI, { locale })
 // 如果想要中文版 element-ui，按如下方式声明
 // Vue.use(ElementUI)
 
+// server.js
+
 Vue.config.productionTip = false
+
+// 注册全局自定义组件
+Vue.use(Component)
 // 实例化Vue
 new Vue({
   el: '#app',

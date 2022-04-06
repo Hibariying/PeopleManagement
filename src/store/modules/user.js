@@ -1,4 +1,4 @@
-import { getToken, setToken, removeToken } from '@/utils/auth'
+import { getToken, setToken, removeToken, setTimeStamp } from '@/utils/auth'
 import { login, getUserInfo, getUserDetailById } from '@/api/user'
 
 const state = {
@@ -36,6 +36,7 @@ const actions = {
     // if (result) {
     // 如果为true,表示登录成功
     context.commit('setToken', result)
+    setTimeStamp()
     // }
   },
   async getUserInfo(context) {

@@ -40,7 +40,8 @@ module.exports = {
     proxy: {
       // 可以代理多个服务器
       '/api': {
-        target: 'http://ihrm-java.itheima.net',
+        // target: 'http://ihrm-java.itheima.net',
+        target: 'http://192.168.22.148:3000',
         changeOrigin: true
         // pathRewrite: {
         //   // 重写路径
