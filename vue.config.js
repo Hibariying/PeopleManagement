@@ -14,7 +14,30 @@ const name = defaultSettings.title || 'Hibariying' // page title
 // You can change the port by the following methods:
 // port = 9528 npm run dev OR npm run dev --port = 9528
 const port = process.env.port || process.env.npm_config_port || 8686 // dev port
-
+let cdn = { css: [], js: [] }
+let externals = {}
+const isProd = process.env.NODE_ENV === 'production' // 判断是否是生产环境
+if (isProd) {
+  // 只有生产环境 才有必要 去做排除和cdn的注入
+  externals = {
+    'element-ui': 'ELEMENT',
+    'xlsx': 'XLSX',
+    'vue': 'Vue'
+  }
+  cdn = {
+    css: [ // element-ui css
+      // 样式表
+      'https://unpkg.com/element-ui/lib/theme-chalk/index.css'],
+    js: [
+      // vue must at first!
+      'https://cdn.jsdelivr.net/npm/vue@2', // vuejs
+      // element-ui js
+      'https://unpkg.com/element-ui/lib/index.js', // elementUI
+      'https://cdn.jsdelivr.net/npm/xlsx@0.16.6/dist/jszip.min.js',
+      'https://cdn.jsdelivr.net/npm/xlsx@0.16.6/dist/xlsx.full.min.js'
+    ]
+  }
+}
 // All configuration item explanations can be find in https://cli.vuejs.org/config/
 module.exports = {
   /**
@@ -40,8 +63,9 @@ module.exports = {
     proxy: {
       // 可以代理多个服务器
       '/api': {
-        // target: 'http://ihrm-java.itheima.net',
-        target: 'http://192.168.22.148:3000',
+        target: 'http://ihrm-java.itheima.net',
+        // target: 'http://localhost:0',
+        // target: 'http://192.168.22.148:3000',
         changeOrigin: true
         // pathRewrite: {
         //   // 重写路径
@@ -58,7 +82,13 @@ module.exports = {
       alias: {
         '@': resolve('src')
       }
-    }
+    },
+    externals: externals
+    // process.env.NODE_ENV === 'production' ? {
+    //   'element-ui': 'ELEMENT',
+    //   'vue': 'Vue',
+    //   'xslx': 'XSLX'
+    // } : {}
   },
   chainWebpack(config) {
     // it can improve the speed of the first screen, it is recommended to turn on preload
@@ -71,7 +101,13 @@ module.exports = {
         include: 'initial'
       }
     ])
-
+    //  注入cdn变量
+    // 这行代码 会在执行打包的时候 执行 就会将cdn变量注入到 html模板中
+    config.plugin('html').tap((args) => {
+      // args 是注入html模板的一个变量
+      args[0].cdn = cdn // 后面的cdn就是定义的变量
+      return args // 需要返回这个参数
+    })
     // when there are many pages, it will cause too many meaningless requests
     config.plugins.delete('prefetch')
 

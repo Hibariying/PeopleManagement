@@ -5,6 +5,10 @@
 //     var response_ok = null // 响应拦截器成功的回调
 //     var response_no = null // 响应拦截器失败的回调
 
+// const { Message } = require('element-ui')
+
+// const { reject } = require('core-js/fn/promise')
+
 // const { ids } = require('webpack')
 
 //     var fn = (config) => {
@@ -118,3 +122,74 @@
 
 // find([1, 2, 3, 2, 2, 2, 5, 4, 3, 5, 3, 7, 3, 9, 3, 8, 3, 0, 3, 2])
 
+// function loop(fn, count) {
+//   return new Promise((resolve, reject) => {
+//     if (fn.count === undefined) {
+//       fn.count = count
+//       if (fn.count > 0) {
+//         fn.count--
+//         try {
+//           fn.result = fn()
+//           if (fn.result instanceof Promise) {
+//             fn.result.then((v) => {
+//               resolve(v)
+//             }).catch(() => {
+//               setTimeout(() => {
+//                 resolve(loop(fn, undefined))
+//               }, 1000)
+//             })
+//           } else {
+//             resolve(fn.result)
+//           }
+//         } catch (err) {
+//           setTimeout(() => {
+//             resolve(loop(fn, undefined))
+//           }, 1000)
+//         }
+//       }
+//       resolve(fn.result)
+//     }
+//   })
+// }
+// loop(() => { throw new Error() }, 14141245)
+// async function loop(count, fn) {
+//   try {
+//     const result = await fn()
+//     return result
+//   } catch (err) {
+//     if (count === 0) return err
+//     setTimeout(() => loop(count - 1, fn), 1000)
+//   }
+// }
+// async function loop(fn, count) {
+//   console.log(count)
+//   try {
+//     var result = await fn()
+//     return result
+//   } catch (error) {
+//     if (count === 0) {
+//       return result
+//     }
+//     setTimeout(() => loop(fn, count - 1), 1000)
+//   }
+// }
+// loop(() => { throw new Error() }, 5)
+// const retry = async(fn, retries) => {
+//   try {
+//     const result = await fn()
+//     return result
+//   } catch (err) {
+//     (err) => retries > 1 ? setTimeout(() => retry(retries - 1, fn), 1000) : Promise.reject(err)
+//   }
+// }
+async function retry(fn, count) {
+  try {
+    const result = await fn()
+    return result
+  } catch (err) {
+    if (count === 0) return err
+    console.log(count)
+    setTimeout(() => retry(count - 1, fn), 1000)
+  }
+}
+retry(() => { throw new Error() }, 5)

@@ -90,8 +90,8 @@ export default {
 
     // 上传操作
     upload(params) {
-      console.log('this is upload`s params:')
-      console.log(params)
+      // console.log('this is upload`s params:')
+      // console.log(params)
       if (params.file) {
         cos.putObject({
           Bucket: 'ly-hibariying-1310488767', // 存储桶

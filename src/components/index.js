@@ -2,6 +2,7 @@ import PageTools from './PageTools'
 import UploadExcel from './UploadExcel'
 import UploadImg from './UploadImg'
 import Print from 'vue-print-nb'
+import LangSelect from './Lang'
 
 export default {
   // Vue的全局对象通过install传入
@@ -11,5 +12,6 @@ export default {
     Vue.component('UploadExcel', UploadExcel) // 注册导入excel组件
     Vue.component('UploadImg', UploadImg)
     Vue.use(Print)
+    Vue.component('LangSelect', LangSelect) // 完成组件的注册
   }
 }

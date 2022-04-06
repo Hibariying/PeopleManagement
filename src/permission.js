@@ -31,9 +31,18 @@ router.beforeEach(async(to, from, next) => {
       // 不是登录页——放过通行
       // 如果当前vuex中有用户资料，则已有资料
       if (!store.getters.userId) {
-        await store.dispatch('user/getUserInfo')
+        // 用户资料
+        const { roles } = await store.dispatch('user/getUserInfo')
+        // 筛选得到的动态路由
+        const routes = await store.dispatch('permission/filterRoutes', roles.menus)
+        // 添加到路由表
+        router.addRoutes([...routes, { path: '*', redirect: '/404', hidden: true }])
+        // addRoutes之后必须用next(地址)
+        next(to.path)
+      } else {
+        next()
       }
-      next()
+      // 在添加路由之后应该使用 **next(to.path)**， 否则会使刷新页面之后 权限消失，这属于一个vue-router的**已知缺陷**
     }
   } else {
     // 没有token

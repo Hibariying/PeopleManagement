@@ -66,6 +66,7 @@
 </template>
 
 <script>
+// import checkPermission from '@/mixin'
 import { getEmployeeList, delEmployee } from '@/api/employees'
 import EmployeeEnum from '@/api/constant/employees'
 import AddEmployee from '@/views/employees/components/add-employee'

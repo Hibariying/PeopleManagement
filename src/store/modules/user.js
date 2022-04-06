@@ -1,6 +1,6 @@
 import { getToken, setToken, removeToken, setTimeStamp } from '@/utils/auth'
 import { login, getUserInfo, getUserDetailById } from '@/api/user'
-
+import { resetRouter } from '@/router'
 const state = {
   token: getToken(), // 设置token为共享状态，初始化vuex的时候，就先从缓存中读取
   userInfo: {}// 定义一个空对象
@@ -42,16 +42,18 @@ const actions = {
   async getUserInfo(context) {
     const result = await getUserInfo()
     const baseInfo = await getUserDetailById(result.userId)
-    const baseResult = { ...result, ...baseInfo }
-    context.commit('setUserInfo', baseResult)// 提交到mutations
-    return baseResult // 给权限留的
+    context.commit('setUserInfo', { ...result, ...baseInfo })// 提交到mutations
+    return result // 给权限留的
   },
   // 登出的action
   logout(context) {
   // 删除token
     context.commit('removeToken') // 不仅仅删除了vuex中的 还删除了缓存中的
     // 删除用户资料
-    context.commit('removeUserInfo') // 删除用户信息
+    context.commit('removeUserInfo') // 重置路由
+    resetRouter()
+    // mutations名称  载荷  {root:true}//调用根级mutations或action
+    context.commit('permission/setRoutes', [], { root: true })
   }
 }
 

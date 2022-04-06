@@ -1,77 +1,71 @@
 <template>
-  <div class="permission-container">
+  <div class="dashboard-container">
     <div class="app-container">
       <!-- 靠右的按钮 -->
       <page-tools>
         <template v-slot:after>
-          <el-button type="primary" size="small">添加权限</el-button>
+          <el-button type="primary" size="small" @click="addPermission(1, '0')">添加权限</el-button>
         </template>
       </page-tools>
-      <!-- 指定id为唯一属性 -->
-      <el-table :data="list" border="" row-key="id">
+      <!-- 表格 -->
+      <!-- 指定id为唯一属性的标识 -->
+      <el-table border :data="list" row-key="id">
         <el-table-column label="名称" prop="name" />
-        <el-table-column label="标识" prop="code" />
-        <el-table-column label="描述" prop="description" />
-        <el-table-column label="操作">
-          <template :v-slot="{row}">
-            <!-- 添加按钮只在访问权的层级显示 -->
-            <!-- 当type为1时为访问权限，type为2时为功能权限 -->
-            <el-button v-if="row.type===1" type="text" @click="addPermission(row.id)">添加</el-button>
+        <el-table-column align="center" label="标识" prop="code" />
+        <el-table-column align="center" label="描述" prop="description" />
+        <el-table-column align="center" label="操作">
+          <template v-slot="{ row }">
+            <!-- 添加按钮只在 访问权的层级显示 当type==1 时才显示添加按钮 -->
+            <el-button v-if="row.type === 1" type="text" @click="addPermission(2, row.id)">添加</el-button>
             <el-button type="text" @click="editPermission(row.id)">编辑</el-button>
             <el-button type="text" @click="delPermission(row.id)">删除</el-button>
           </template>
         </el-table-column>
+
       </el-table>
     </div>
-    <!-- 新增和编辑弹层 -->
-    <el-dialog
-      :title="`${showText}权限点`"
-      :visible="showDialog"
-      @close="btnCancel"
-    >
-      <el-form ref="perform" v-model="formData" :rules="rules" label-width="120px">
-        <el-form-item label="权限名称" prop="name">
+    <!-- 新增编辑弹层 -->
+    <el-dialog :visible="showDialog" :title="showText" @close="btnCancel">
+      <!-- 表单 -->
+      <el-form ref="permForm" :model="formData" :rules="rules" label-width="120px">
+        <el-form-item label="名称" prop="name">
           <el-input v-model="formData.name" style="width:90%" />
         </el-form-item>
-        <el-form-item label="权限标识" prop="code">
+        <el-form-item label="标识" prop="code">
           <el-input v-model="formData.code" style="width:90%" />
         </el-form-item>
-        <el-form-item label="权限描述">
-          <el-input v-model="formData.description" style="90%" />
+        <el-form-item label="描述">
+          <el-input v-model="formData.description" style="width:90%" />
         </el-form-item>
-        <!-- 1开0关 -->
         <el-form-item label="开启">
+          <!-- 当值为1时 激活 当值为0时  不激活 -->
           <el-switch
             v-model="formData.enVisible"
-            active-color="1"
-            inactive-color="0"
+            active-value="1"
+            inactive-value="0"
+            style="width:90%"
           />
         </el-form-item>
       </el-form>
-      <!-- 底部确定和提交 -->
-      <!-- <el-row type="flex" justify="center">
+      <!-- 底部的确定和取消 -->
+      <el-row slot="footer" type="flex" justify="center">
         <el-col :span="6">
-          <el-button
-            type="primary"
-            size="small"
-            @click="btnOK"
-          >确 定</el-button>
-          <el-button size="small" @click="btnCancel">取 消</el-button>
+          <el-button type="primary" size="small" @click="btnOK">确定</el-button>
+          <el-button size="small" @click="btnCancel">取消</el-button>
         </el-col>
-      </el-row> -->
-
+      </el-row>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { getPermissionList, updatePermissionList, delPermissionList, getPermissionDetail } from '@/api/permission'
+import { getPermissionList, delPermission, addPermission, updatePermission, getPermissionDetail } from '@/api/permission'
 import { tranListToTreeData } from '@/utils'
-
 export default {
   data() {
     return {
       list: [],
+      showDialog: false,
       formData: {
         name: '', // 名称
         code: '', // 标识
@@ -83,63 +77,56 @@ export default {
       rules: {
         name: [{ required: true, message: '权限名称不能为空', trigger: 'blur' }],
         code: [{ required: true, message: '权限标识不能为空', trigger: 'blur' }]
-      },
-      showDialog: false
-
-    }
+      }}
   },
   computed: {
     showText() {
-      return this.formData.id ? '编辑' : '新增'
+      return this.formData.id ? '编辑权限' : '新增权限'
     }
   },
   created() {
     this.getPermissionList()
   },
   methods: {
-    // 获取权限
     async getPermissionList() {
-      // 将数据转换成树形
+      // 将数据转化成了 带chilren的树形结构
       this.list = tranListToTreeData(await getPermissionList(), '0')
     },
-    // 添加权限
-    async addPermission(pid, type) {
-      this.formData.pid = pid
-      this.formData.type = type
-      this.showDialog = true
-    },
-    // 编辑权限
-    async editPermission(id) {
-      this.formData = await updatePermissionList(id)
-      this.showDialog = true
-    },
-    // 删除权限
-    async delPermission(id) {
-      try {
-        await this.$confirm('确定要删除该数据吗')
-        await delPermissionList(id)
-        this.getPermissionList()
-        this.$message.success('删除成功')
-        getPermissionDetail(id)
-      } catch (error) {
-        console.log(error)
-      }
-    },
-    // 确认
-    btnOK() {
-      this.$refs.perForm.validate().then(() => {
-        if (this.formData.id) {
-          return updatePermissionList(this.formData)
-        }
-        return this.addPermission(this.formData)
+    delPermission(id) {
+      this.$confirm('确认删除该权限点吗').then(() => {
+        return delPermission(id)
       }).then(() => {
-        // 提示消息
-        this.$message.success('新增成功')
+        this.$message.success('删除成功')
+        // 重新拉取数据
+        this.getPermissionList()
+      })
+    },
+    addPermission(type, pid) {
+      // 访问权的type = 1  按钮操作的权type =2
+      // pid表示当前数据的父节点的标识
+      // 记录当前添加的类型和父标识
+      this.formData.type = type
+      this.formData.pid = pid
+      this.showDialog = true
+    },
+    btnOK() {
+      // this.$refs.permForm.validate(isOK => {})
+      this.$refs.permForm.validate().then(() => {
+        // 校验成功
+        if (this.formData.id) {
+          // 认为是编辑
+          return updatePermission(this.formData)
+        }
+        return addPermission(this.formData) // 新增接口
+      }).then(() => {
+        // 添加成功
+        this.$message.success('操作成功')
         this.getPermissionList()
         this.showDialog = false
       })
     },
     btnCancel() {
+      // 重置数据
       this.formData = {
         name: '', // 名称
         code: '', // 标识
@@ -148,11 +135,15 @@ export default {
         pid: '', // 因为做的是树 需要知道添加到哪个节点下了
         enVisible: '0' // 开启
       }
-      this.$refs.perForm.resetFields()
+      // 移除校验
+      this.$refs.permForm.resetFields() // 移除校验
       this.showDialog = false
+    },
+    async  editPermission(id) {
+      this.formData = await getPermissionDetail(id)
+      this.showDialog = true
     }
   }
-
 }
 </script>
 

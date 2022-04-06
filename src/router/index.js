@@ -1,6 +1,17 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
+// 引入多个模块的规则
+import approvalsRouter from './modules/approvals'
+import departmentsRouter from './modules/departments'
+import employeesRouter from './modules/employees'
+import permissionRouter from './modules/permission'
+import attendancesRouter from './modules/attendances'
+import salarysRouter from './modules/salarys'
+import settingRouter from './modules/setting'
+import socialRouter from './modules/social'
+// import userRouter from './modules/user'
+
 Vue.use(Router)
 
 /* Layout */
@@ -30,16 +41,6 @@ import Layout from '@/layout'
  * a base page that does not have permission requirements
  * all roles can be accessed
  */
-
-// 引入多个模块的规则
-import approvalsRouter from './modules/approvals'
-import departmentsRouter from './modules/departments'
-import employeesRouter from './modules/employees'
-import permissionRouter from './modules/permission'
-import attendancesRouter from './modules/attendances'
-import salarysRouter from './modules/salarys'
-import settingRouter from './modules/setting'
-import socialRouter from './modules/social'
 
 // 动态路由
 export const asyncRoutes = [
@@ -72,9 +73,9 @@ export const constantRoutes = [
     redirect: '/dashboard',
     children: [{
       path: 'dashboard',
-      name: 'Dashboard',
+      name: 'dashboard',
       component: () => import('@/views/dashboard/index'),
-      meta: { title: 'Dashboard', icon: 'dashboard' }
+      meta: { title: '首页', icon: 'dashboard' }
     }]
   },
   // **新建一个公共的导入页面，挂载路由**
@@ -86,18 +87,19 @@ export const constantRoutes = [
       path: '', // 默认二级
       component: () => import('@/views/import')
     }]
-  },
-
+  }
+  // userRouter, // 放置一个都可以访问的路由
   // 404 page must be placed at the end !!!
-  { path: '*', redirect: '/404', hidden: true }
+  // { path: '*', redirect: '/404', hidden: true }
 ]
 
 const createRouter = () => new Router({
-  // mode: 'history', // require service support
+  mode: 'history', // require service support
+  base: 'hr/',
   // 管理滚动行为，如果出现滚动就切换，让页面回到顶部
   scrollBehavior: () => ({ y: 0 }),
   // 临时合并所有的路由
-  routes: [...constantRoutes, ...asyncRoutes]
+  routes: [...constantRoutes]
 })
 
 const router = createRouter()
