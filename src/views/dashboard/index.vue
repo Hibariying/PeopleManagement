@@ -9,7 +9,6 @@
           </div>
           <div class="headInfoTip">
             <p class="firstChild">早安，{{ userInfo.username }}，祝你开心每一天！</p>
-            <!-- <p class="lastChild">{{ userInfo.username }}  |  {{ userInfo.companyName }}-{{ userInfo.departmentName }}</p> -->
           </div>
         </div>
         <div class="fr" />
